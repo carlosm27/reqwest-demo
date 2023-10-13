@@ -1,0 +1,2 @@
+https://www.fruityvice.com/api/fruit/apple
+https://www.fruityvice.com/api/fruit/banana
