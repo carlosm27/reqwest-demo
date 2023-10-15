@@ -1,0 +1,8 @@
+[urls]
+url = ["http://locahost:4000/tasks" ]
+
+[http-methods]
+method = ["GET"]
+
+[request-body]
+body = ""
