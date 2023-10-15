@@ -11,10 +11,10 @@ async fn get_request() -> Result<(), Error> {
         Ok(file_contents) => {
             for url in file_contents {
                 let response = reqwest::get(url).await?;
-                println!("Status: {}", response.status());
+                println!("Status code: {}", response.status());
 
                 let body = response.text().await?;
-                println!("Body:\n{}", body);
+                println!("Response body:\n{}", body);
             }
         }
 
@@ -27,6 +27,29 @@ async fn get_request() -> Result<(), Error> {
     
 }
 
+async fn post_request() -> Result<(), Error> {
+    let url = "http://localhost:4000/tasks";
+    let json_data = r#"{"title":"Problems during installation","status":"todo","priority":"medium","label":"bug"}"#;
+
+    let client = reqwest::Client::new();
+
+    let response = client
+        .post(url)
+        .header("Content-Type", "application/json")
+        .body(json_data.to_owned())
+        .send()
+        .await?;
+    
+    println!("Status code: {}", response.status());
+
+    let response_body = response.text().await?;
+
+    println!("Response body: \n{}", response_body);
+
+    Ok(())
+
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let file_path = "./urls.txt";
@@ -34,5 +57,7 @@ async fn main() -> Result<(), Error> {
     
     println!("{:?}", url_vector);
     get_request().await?;
+
+    post_request().await?;
     Ok(())
 }
