@@ -2,6 +2,45 @@ use reqwest::Error;
 mod helpers;
 use helpers::{read_file_lines_to_vec};
 
+use serde::Deserialize;
+use std::fs;
+
+
+#[derive(Deserialize)]
+struct Config {
+   urls: UrlConfig,
+   //http_method: HttpMethod,
+}
+#[derive(Deserialize)]
+struct UrlConfig {
+    url: Vec<String>
+}
+
+#[derive(Deserialize)]
+struct HttpMethod {
+    method: Vec<String>,
+}
+
+
+
+#[tokio::main]
+async fn main() -> Result<(), Error> {
+    //let file_path = "./urls.txt";
+   // let url_vector = read_file_lines_to_vec(&file_path.to_string());
+    
+   // println!("{:?}", url_vector);
+
+    let config_content = fs::read_to_string("config.toml").unwrap();
+    let config: Config = toml::from_str(&config_content).unwrap();
+
+    
+
+    println!("{:?}", config.urls.url);
+   
+    //delete_request().await?;
+    Ok(())
+}
+
 async fn get_request() -> Result<(), Error> {
 
     let file_path = "./urls.txt";
@@ -88,16 +127,5 @@ async fn delete_request() -> Result<(), Error> {
 
     println!("Response body: \n{}", response_body);
 
-    Ok(())
-}
-
-#[tokio::main]
-async fn main() -> Result<(), Error> {
-    let file_path = "./urls.txt";
-    let url_vector = read_file_lines_to_vec(&file_path.to_string());
-    
-    println!("{:?}", url_vector);
-   
-    delete_request().await?;
     Ok(())
 }
