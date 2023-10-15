@@ -50,14 +50,54 @@ async fn post_request() -> Result<(), Error> {
 
 }
 
+async fn put_request() -> Result<(), Error> {
+    let url = "http://localhost:4000/tasks/7";
+    let json_data = r#"{"title":"Problems during installation","status":"todo","priority":"low","label":"bug"}"#;
+
+    let client = reqwest::Client::new();
+
+    let response = client
+        .put(url)
+        .header("Content-Type", "application/json")
+        .body(json_data.to_owned())
+        .send()
+        .await?;
+    
+    println!("Status code: {}", response.status());
+
+    let response_body = response.text().await?;
+
+    println!("Response body: \n{}", response_body);
+
+    Ok(())
+}
+
+async fn delete_request() -> Result<(), Error> {
+    let url = "http://localhost:4000/tasks/5";
+
+    let client = reqwest::Client::new();
+
+    let response = client
+        .delete(url)
+        .send()
+        .await?;
+    
+    println!("Status code: {}", response.status());
+
+    let response_body = response.text().await?;
+
+    println!("Response body: \n{}", response_body);
+
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let file_path = "./urls.txt";
     let url_vector = read_file_lines_to_vec(&file_path.to_string());
     
     println!("{:?}", url_vector);
-    get_request().await?;
-
-    post_request().await?;
+   
+    delete_request().await?;
     Ok(())
 }
