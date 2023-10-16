@@ -7,41 +7,71 @@ use std::fs;
 
 
 #[derive(Deserialize)]
-struct Config {
-   urls: UrlConfig,
-   //http_method: HttpMethod,
+struct Data {
+   config: Config,
 }
 #[derive(Deserialize)]
-struct UrlConfig {
-    url: Vec<String>
+struct Config {
+    url: String,
+    method: String,
+    body: String,
 }
 
-#[derive(Deserialize)]
-struct HttpMethod {
-    method: Vec<String>,
-}
 
 
 
 #[tokio::main]
-async fn main() -> Result<(), Error> {
+async fn main()-> Result<(), Error> {
     //let file_path = "./urls.txt";
    // let url_vector = read_file_lines_to_vec(&file_path.to_string());
     
    // println!("{:?}", url_vector);
 
-    let config_content = fs::read_to_string("config.toml").unwrap();
-    let config: Config = toml::from_str(&config_content).unwrap();
+    
+    //let config = parse_toml_config()?;
+    let filename = "config.toml";
+    
+    let contents = match fs::read_to_string(filename) {
+        // If successful return the files text as `contents`.
+        // `c` is a local variable.
+        Ok(c) => c,
+        // Handle the `error` case.
+        Err(error) => {
+            // Write `msg` to `stderr`.
+            (&error).to_string()
+            // Exit the program with exit code `1`.
+        
+        }
+    };
+
+    let data: Data = match toml::from_str(&contents) {
+        // If successful, return data as `Data` struct.
+        // `d` is a local variable.
+        Ok(d) => d,
+        // Handle the `error` case.
+        Err(error) => {
+            // Write `msg` to `stderr`.
+            eprintln!("Unable to load data from `{}`", error);
+            // Exit the program with exit code `1`.
+            std::process::exit(1);
+        }
+    };
+
 
     
 
-    println!("{:?}", config.urls.url);
-   
-    //delete_request().await?;
+    println!("{}", data.config.url);
+    println!("{}", data.config.method);
+    println!("{}", data.config.body);
+
+    
     Ok(())
+
+    
 }
 
-async fn get_request() -> Result<(), Error> {
+
+async fn _get_request() -> Result<(), Error> {
 
     let file_path = "./urls.txt";
     let url_vector = read_file_lines_to_vec(&file_path.to_string());
@@ -66,7 +96,7 @@ async fn get_request() -> Result<(), Error> {
     
 }
 
-async fn post_request() -> Result<(), Error> {
+async fn _post_request() -> Result<(), Error> {
     let url = "http://localhost:4000/tasks";
     let json_data = r#"{"title":"Problems during installation","status":"todo","priority":"medium","label":"bug"}"#;
 
@@ -89,7 +119,7 @@ async fn post_request() -> Result<(), Error> {
 
 }
 
-async fn put_request() -> Result<(), Error> {
+async fn _put_request() -> Result<(), Error> {
     let url = "http://localhost:4000/tasks/7";
     let json_data = r#"{"title":"Problems during installation","status":"todo","priority":"low","label":"bug"}"#;
 
@@ -111,7 +141,7 @@ async fn put_request() -> Result<(), Error> {
     Ok(())
 }
 
-async fn delete_request() -> Result<(), Error> {
+async fn _delete_request() -> Result<(), Error> {
     let url = "http://localhost:4000/tasks/5";
 
     let client = reqwest::Client::new();
