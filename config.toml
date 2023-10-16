@@ -1,6 +1,6 @@
 [config]
-url = "http://localhost:4000/tasks/8"
-method = "DELETE"
+url = "https://www.fruityvice.com/api/fruit/apple"
+method = "GET"
 body = ""
 
 
