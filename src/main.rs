@@ -6,6 +6,11 @@ use serde::Deserialize;
 use std::fs;
 use serde_json::Value;
 
+mod http_methods;
+use http_methods::{get_request, post_request, put_request, delete_request};
+
+
+
 #[derive(Deserialize)]
 struct Data {
    config: Config,
@@ -21,6 +26,8 @@ struct Config {
 
 
 
+
+
 #[tokio::main]
 async fn main()-> Result<(), Error> {
     //let file_path = "./urls.txt";
@@ -29,7 +36,7 @@ async fn main()-> Result<(), Error> {
    // println!("{:?}", url_vector);
 
     
-    //let config = parse_toml_config()?;
+   
     let filename = "config.toml";
     
     let contents = match fs::read_to_string(filename) {
@@ -63,7 +70,7 @@ async fn main()-> Result<(), Error> {
         serde_json::from_str::<Value>(&file_content).expect("Error serializing to JSON")
     };
 
-
+    /*
     if data.config.method == "DELETE" {
         delete_request(data.config.url).await;
     } else if data.config.method == "POST" {
@@ -75,108 +82,33 @@ async fn main()-> Result<(), Error> {
         
         get_request(data.config.url).await;
     }
-
-    
-
-    
-    Ok(())
-
-    
-}
-
-
-async fn get_request(url: String) -> Result<(), Error> {
-    /*
-    let file_path = "./urls.txt";
-    let url_vector = read_file_lines_to_vec(&file_path.to_string());
-    match &url_vector {
-        // If the operation was successful, make requests to urls in the file.
-        Ok(file_contents) => {
-            for url in file_contents {
-                let response = reqwest::get(url).await?;
-                println!("Status code: {}", response.status());
-
-                let body = response.text().await?;
-                println!("Response body:\n{}", body);
-            }
-        }
-
-        // If the operation failed, print the error message to the console.
-        Err(error) => {
-            println!("Error reading file: {}", error);
-        }
-    }
     */
+    let result = method_flow(&data.config.method, data.config.url, body.to_string()).await;
 
-    let response = reqwest::get(url).await?;
-    println!("Status code: {}", response.status());
+    match result {
+        Ok(()) => println!("Success!"),
+        Err(e) => println!("Error: {:?}", e),
+    }
 
-    let body = response.text().await?;
-    println!("Response body:\n{}", body);
+    
+
+    
     Ok(())
+
     
 }
 
-async fn post_request(url: String, json_data: String) -> Result<(), Error> {
-    //let url = "http://localhost:4000/tasks";
-    //let json_data = r#"{"title":"Problems during installation","status":"todo","priority":"medium","label":"bug"}"#;
 
-    let client = reqwest::Client::new();
+async fn method_flow(http_method: &str, url: String, body: String) -> Result<(), reqwest::Error> {
 
-    let response = client
-        .post(url)
-        .header("Content-Type", "application/json")
-        .body(json_data.to_owned())
-        .send()
-        .await?;
-    
-    println!("Status code: {}", response.status());
+    match http_method {
+        "GET" => get_request(url).await,
+        "POST" => post_request(url, body).await,
+        "PUT" => put_request(url, body).await,
+        "DELETE" => delete_request(url).await,
+        &_ => todo!(),
 
-    let response_body = response.text().await?;
-
-    println!("Response body: \n{}", response_body);
-
-    Ok(())
-
+    }
 }
 
-async fn put_request(url: String, json_data: String) -> Result<(), Error> {
-    //let url = "http://localhost:4000/tasks/7";
-    //let json_data = r#"{"title":"Problems during installation","status":"todo","priority":"low","label":"bug"}"#;
 
-    let client = reqwest::Client::new();
-
-    let response = client
-        .put(url)
-        .header("Content-Type", "application/json")
-        .body(json_data.to_owned())
-        .send()
-        .await?;
-    
-    println!("Status code: {}", response.status());
-
-    let response_body = response.text().await?;
-
-    println!("Response body: \n{}", response_body);
-
-    Ok(())
-}
-
-async fn delete_request(url: String) -> Result<(), Error> {
-    //let url = "http://localhost:4000/tasks/5";
-
-    let client = reqwest::Client::new();
-
-    let response = client
-        .delete(url)
-        .send()
-        .await?;
-    
-    println!("Status code: {}", response.status());
-
-    let response_body = response.text().await?;
-
-    println!("Response body: \n{}", response_body);
-
-    Ok(())
-}
