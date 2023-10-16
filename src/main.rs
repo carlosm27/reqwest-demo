@@ -1,10 +1,10 @@
 use reqwest::Error;
 mod helpers;
-use helpers::{read_file_lines_to_vec};
+//use helpers::{read_file_lines_to_vec};
 
 use serde::Deserialize;
 use std::fs;
-
+use serde_json::Value;
 
 #[derive(Deserialize)]
 struct Data {
@@ -14,8 +14,9 @@ struct Data {
 struct Config {
     url: String,
     method: String,
-    body: String,
 }
+
+
 
 
 
@@ -51,18 +52,31 @@ async fn main()-> Result<(), Error> {
         // Handle the `error` case.
         Err(error) => {
             // Write `msg` to `stderr`.
-            eprintln!("Unable to load data from `{}`", error);
+            eprintln!("Unable to load data because `{}`", error);
             // Exit the program with exit code `1`.
             std::process::exit(1);
         }
     };
 
+    let body = {
+        let file_content = fs::read_to_string("./body.json").expect("Error reading file");
+        serde_json::from_str::<Value>(&file_content).expect("Error serializing to JSON")
+    };
+
+
+    if data.config.method == "DELETE" {
+        get_request(data.config.url).await;
+    } else if data.config.method == "POST" {
+        post_request(data.config.url, body.to_string()).await;
+
+    } else if data.config.method == "PUT" || data.config.method == "PATCH" {
+        println!("{}", body.to_string());
+    } else {
+        
+        get_request(data.config.url).await;
+    }
 
     
-
-    println!("{}", data.config.url);
-    println!("{}", data.config.method);
-    println!("{}", data.config.body);
 
     
     Ok(())
@@ -71,8 +85,8 @@ async fn main()-> Result<(), Error> {
 }
 
 
-async fn _get_request() -> Result<(), Error> {
-
+async fn get_request(url: String) -> Result<(), Error> {
+    /*
     let file_path = "./urls.txt";
     let url_vector = read_file_lines_to_vec(&file_path.to_string());
     match &url_vector {
@@ -92,13 +106,20 @@ async fn _get_request() -> Result<(), Error> {
             println!("Error reading file: {}", error);
         }
     }
+    */
+
+    let response = reqwest::get(url).await?;
+    println!("Status code: {}", response.status());
+
+    let body = response.text().await?;
+    println!("Response body:\n{}", body);
     Ok(())
     
 }
 
-async fn _post_request() -> Result<(), Error> {
-    let url = "http://localhost:4000/tasks";
-    let json_data = r#"{"title":"Problems during installation","status":"todo","priority":"medium","label":"bug"}"#;
+async fn post_request(url: String, json_data: String) -> Result<(), Error> {
+    //let url = "http://localhost:4000/tasks";
+    //let json_data = r#"{"title":"Problems during installation","status":"todo","priority":"medium","label":"bug"}"#;
 
     let client = reqwest::Client::new();
 
