@@ -65,12 +65,12 @@ async fn main()-> Result<(), Error> {
 
 
     if data.config.method == "DELETE" {
-        get_request(data.config.url).await;
+        delete_request(data.config.url).await;
     } else if data.config.method == "POST" {
         post_request(data.config.url, body.to_string()).await;
 
-    } else if data.config.method == "PUT" || data.config.method == "PATCH" {
-        println!("{}", body.to_string());
+    } else if data.config.method == "PUT" {
+       put_request(data.config.url, body.to_string()).await;
     } else {
         
         get_request(data.config.url).await;
@@ -140,9 +140,9 @@ async fn post_request(url: String, json_data: String) -> Result<(), Error> {
 
 }
 
-async fn _put_request() -> Result<(), Error> {
-    let url = "http://localhost:4000/tasks/7";
-    let json_data = r#"{"title":"Problems during installation","status":"todo","priority":"low","label":"bug"}"#;
+async fn put_request(url: String, json_data: String) -> Result<(), Error> {
+    //let url = "http://localhost:4000/tasks/7";
+    //let json_data = r#"{"title":"Problems during installation","status":"todo","priority":"low","label":"bug"}"#;
 
     let client = reqwest::Client::new();
 
@@ -162,8 +162,8 @@ async fn _put_request() -> Result<(), Error> {
     Ok(())
 }
 
-async fn _delete_request() -> Result<(), Error> {
-    let url = "http://localhost:4000/tasks/5";
+async fn delete_request(url: String) -> Result<(), Error> {
+    //let url = "http://localhost:4000/tasks/5";
 
     let client = reqwest::Client::new();
 
