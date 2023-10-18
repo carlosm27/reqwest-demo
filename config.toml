@@ -1,6 +1,5 @@
 [config]
 url = "https://www.fruityvice.com/api/fruit/apple"
 method = "GET"
-body = ""
 
 
