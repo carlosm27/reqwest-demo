@@ -1,4 +1,4 @@
-use reqwest::Error;
+//use reqwest::Error;
 mod helpers;
 //use helpers::{read_file_lines_to_vec};
 
@@ -8,7 +8,6 @@ use serde_json::Value;
 
 mod http_methods;
 use http_methods::{get_request, post_request, put_request, delete_request};
-
 
 
 #[derive(Deserialize)]
@@ -24,12 +23,8 @@ struct Config {
 
 
 
-
-
-
-
 #[tokio::main]
-async fn main()-> Result<(), Error> {
+async fn main()-> Result<(), ParseError> {
     //let file_path = "./urls.txt";
    // let url_vector = read_file_lines_to_vec(&file_path.to_string());
     
@@ -83,6 +78,8 @@ async fn main()-> Result<(), Error> {
         get_request(data.config.url).await;
     }
     */
+
+ 
     let result = method_flow(&data.config.method, data.config.url, body.to_string()).await;
 
     match result {
@@ -98,17 +95,14 @@ async fn main()-> Result<(), Error> {
     
 }
 
-
-async fn method_flow(http_method: &str, url: String, body: String) -> Result<(), reqwest::Error> {
+async fn method_control(http_method: &str, url: String, body: String) -> Result<(), reqwest::Error> {
 
     match http_method {
-        "GET" => get_request(url).await,
         "POST" => post_request(url, body).await,
         "PUT" => put_request(url, body).await,
         "DELETE" => delete_request(url).await,
-        &_ => todo!(),
+        _ => get_request(url).await,
 
     }
 }
-
 
