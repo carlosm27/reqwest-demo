@@ -1,4 +1,4 @@
-//use reqwest::Error;
+use reqwest::Error;
 mod helpers;
 //use helpers::{read_file_lines_to_vec};
 
@@ -24,7 +24,7 @@ struct Config {
 
 
 #[tokio::main]
-async fn main()-> Result<(), ParseError> {
+async fn main()-> Result<(), Error> {
     //let file_path = "./urls.txt";
    // let url_vector = read_file_lines_to_vec(&file_path.to_string());
     
@@ -80,16 +80,13 @@ async fn main()-> Result<(), ParseError> {
     */
 
  
-    let result = method_flow(&data.config.method, data.config.url, body.to_string()).await;
+    let result = method_control(&data.config.method, data.config.url, body.to_string()).await;
 
     match result {
         Ok(()) => println!("Success!"),
         Err(e) => println!("Error: {:?}", e),
     }
 
-    
-
-    
     Ok(())
 
     
