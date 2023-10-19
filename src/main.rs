@@ -83,10 +83,9 @@ async fn main()-> Result<(), Error> {
     let result = method_control(&data.config.method, data.config.url, body.to_string()).await;
 
     match result {
-        Ok(()) => println!("Success!"),
-        Err(e) => println!("Error: {:?}", e),
+        Ok(contents) => contents,
+        Err(e) => println!("Error during the request: {}", e),
     }
-
     Ok(())
 
     
